@@ -40,19 +40,56 @@ const server = new McpServer({
 
 > 💡 **팁**: 현재 보일러플레이트에는 이미 계산기와 인사 도구, 그리고 서버 정보 리소스가 예시로 구현되어 있습니다.
 
-### 3. 빌드
+### 3. 로컬 stdio 빌드
 
 ```bash
-npm run build
+npm run build:stdio
 ```
 
-### 4. 실행
+### 4. 로컬 stdio 실행
 
 ```bash
-node build/index.js
+npm run stdio
 ```
 
-빌드가 성공하면 `build/` 디렉토리에 컴파일된 JavaScript 파일이 생성되고, 서버가 MCP 클라이언트의 연결을 대기합니다.
+빌드가 성공하면 `build/stdio.js`가 생성되고, MCP 클라이언트의 stdio 연결을 대기합니다.
+
+### 5. HTTP (Next.js) 개발 서버
+
+같은 코드를 HTTP 트랜스포트로 띄우려면:
+
+```bash
+npm run dev
+```
+
+`http://localhost:3000/api/mcp` 엔드포인트에서 Streamable HTTP MCP 요청을 받습니다.
+
+## ☁️ Vercel 배포
+
+이 프로젝트는 Next.js App Router + [`mcp-handler`](https://github.com/vercel/mcp-handler) 기반으로 Vercel에 그대로 배포할 수 있습니다.
+
+1. GitHub 저장소를 Vercel 프로젝트로 import 합니다.
+2. (선택) 환경변수 `HF_TOKEN` 을 Vercel 대시보드에 등록하면 헤더 미전송 시 폴백으로 사용됩니다.
+3. 배포가 완료되면 MCP 엔드포인트는 `https://<your-domain>/api/mcp` 입니다.
+
+### 원격 MCP 서버에 Cursor 연결
+
+```json
+{
+    "mcpServers": {
+        "my-mcp-server-remote": {
+            "url": "https://<your-domain>/api/mcp",
+            "headers": {
+                "x-hf-token": "hf_xxxxxxxxxxxx"
+            }
+        }
+    }
+}
+```
+
+`generate-image` 도구는 요청별로 `x-hf-token` 헤더에서 HuggingFace 토큰을 읽습니다. 헤더가 없으면 서버의 `HF_TOKEN` 환경변수를 폴백으로 사용합니다.
+
+> Vercel Hobby 플랜은 함수 실행시간 제한이 짧으므로 (`maxDuration = 60`), 이미지 생성이 느린 경우 Pro 플랜이 필요할 수 있습니다.
 
 ## 🛠️ 개발 가이드
 
